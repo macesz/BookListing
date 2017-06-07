@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Orshi\'s Book searcher app</string>
+
+    <!-- Error message when there is no internet connectivity [CHAR LIMIT=NONE] -->
+    <string name="no_internet_connection">No internet connection.</string>
+
+    <!-- Text to display in the list when there are no books [CHAR LIMIT=NONE] -->
+    <string name="no_books">No books found. Try again.</string>
+
+    <string name="search_hint">Type your book here</string>
+</resources>
