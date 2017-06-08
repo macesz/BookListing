@@ -24,7 +24,9 @@ import java.util.List;
 
 public class QueryUtils {
 
-    /** Tag for the log messages */
+    /**
+     * Tag for the log messages
+     */
 
     private static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
@@ -217,5 +219,4 @@ public class QueryUtils {
         // Return the list of books
         return books;
     }
-
 }

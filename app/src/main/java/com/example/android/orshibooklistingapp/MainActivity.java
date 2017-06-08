@@ -13,11 +13,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 
-
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
 
     public SearchManager searchManager;
+
+    // hide the soft keyboard when clicking the search button
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +56,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_indicator);
         progressBar.setVisibility(View.GONE);
 
-    }
-
-    // hide the soft keyboard when clicking the search button
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) activity.getSystemService(
-                        Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     @Override

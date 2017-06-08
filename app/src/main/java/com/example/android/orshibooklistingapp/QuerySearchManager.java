@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 /**
  * Created by orsi on 07/06/2017.
  */
@@ -144,11 +143,11 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         });
     }
 
-        @Override
-        public Loader<List<Book>> onCreateLoader(int i, Bundle bundle) {
-            // Create a new loader for the given URL
-            return new BookLoader(this, finalRequestUrl);
-        }
+    @Override
+    public Loader<List<Book>> onCreateLoader(int i, Bundle bundle) {
+        // Create a new loader for the given URL
+        return new BookLoader(this, finalRequestUrl);
+    }
 
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
         // Hide loading indicator because the data has been loaded
@@ -166,6 +165,7 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
             mAdapter.addAll(books);
         }
     }
+
     @Override
     public void onLoaderReset(Loader<List<Book>> loader) {
         // Loader reset, so we can clear out our existing data.

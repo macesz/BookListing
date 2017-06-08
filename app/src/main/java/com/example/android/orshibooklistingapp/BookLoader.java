@@ -9,7 +9,7 @@ import java.util.List;
  * Created by orsi on 07/06/2017.
  */
 
-public class BookLoader extends AsyncTaskLoader<List<Book>>{
+public class BookLoader extends AsyncTaskLoader<List<Book>> {
     /**
      * Query URL
      */
