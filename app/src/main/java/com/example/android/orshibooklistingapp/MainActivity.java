@@ -27,6 +27,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
 
+    public void fetchResults(String query) {
+        Intent i = new Intent(getApplicationContext(), QuerySearchManager.class);
+        i.putExtra("QueryStr", query);
+        startActivity(i);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,10 +45,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             @Override
             public boolean onQueryTextSubmit(String query) {
                 hideSoftKeyboard(MainActivity.this);
-                String text = searchView.getQuery().toString();
-                Intent i = new Intent(getApplicationContext(), QuerySearchManager.class);
-                i.putExtra("Title", text);
-                startActivity(i);
+                fetchResults(query);
                 return false;
             }
 
@@ -51,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 return false;
             }
         });
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_indicator);
         progressBar.setVisibility(View.GONE);

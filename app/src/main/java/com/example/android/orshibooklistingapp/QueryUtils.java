@@ -29,6 +29,8 @@ public class QueryUtils {
      */
 
     private static final String LOG_TAG = QueryUtils.class.getSimpleName();
+    private static final int CONNECTION_TIMEOUT = 15000;
+    private static final int READ_TIMEOUT = 10000;
 
     /**
      * Create a private constructor because no one should ever create a {@link QueryUtils} object.
@@ -43,11 +45,7 @@ public class QueryUtils {
      * Query the Google books dataset and return a list of {@link Book} objects.
      */
     public static List<Book> fetchBookData(String requestUrl) {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
 
         // Create URL object
         URL url = createUrl(requestUrl);
@@ -93,8 +91,8 @@ public class QueryUtils {
         InputStream inputStream = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setConnectTimeout(CONNECTION_TIMEOUT);
+            urlConnection.setReadTimeout(READ_TIMEOUT);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
             // If the request was successful (response code 200),

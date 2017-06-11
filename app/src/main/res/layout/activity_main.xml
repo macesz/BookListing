@@ -21,7 +21,6 @@
         android:dividerHeight="0dp"
         android:orientation="vertical" />
     <!--</LinearLayout>-->
-
     <ImageView
         android:id="@+id/books"
         android:layout_width="wrap_content"

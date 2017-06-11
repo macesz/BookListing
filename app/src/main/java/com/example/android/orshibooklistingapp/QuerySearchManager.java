@@ -25,6 +25,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.orshibooklistingapp.MainActivity.hideSoftKeyboard;
+
 
 /**
  * Created by orsi on 07/06/2017.
@@ -43,6 +45,12 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     private BookAdapater mAdapter;
     private String finalRequestUrl;
 
+    public void fetchResults(String query) {
+        Intent i = new Intent(getApplicationContext(), QuerySearchManager.class);
+        i.putExtra("Title", query);
+        startActivity(i);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +64,31 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         ImageView booksImage = (ImageView) findViewById(R.id.books);
         booksImage.setVisibility(View.GONE);
 
-        String passedTitle = getIntent().getStringExtra("Title");
+        String QueryStr = getIntent().getStringExtra("QueryStr");
+        try {
+            finalRequestUrl = GOOGLE_BOOKS_REQUEST_URL + URLEncoder.encode(QueryStr.toLowerCase(), "UTF-8")
+                    + END_OF_REQUEST;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        Log.e(LOG_TAG, finalRequestUrl);
+
+
+        final SearchView searchView = (SearchView) findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                hideSoftKeyboard(QuerySearchManager.this);
+                fetchResults(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         // Find a reference to the {@link ListView} in the layout
         ListView bookListView = (ListView) findViewById(R.id.list);
@@ -65,15 +97,7 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         bookListView.setEmptyView(mEmptyStateTextView);
 
 
-        try {
-            finalRequestUrl = GOOGLE_BOOKS_REQUEST_URL + URLEncoder.encode(passedTitle.toLowerCase(), "UTF-8")
-                    + END_OF_REQUEST;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        Log.e(LOG_TAG, finalRequestUrl);
-
-        /** Adapter for the list of books */
+        /* Adapter for the list of books */
         mAdapter = new BookAdapater(this, new ArrayList<Book>());
 
         // Set the adapter on the ListView
@@ -124,23 +148,6 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
             mEmptyStateTextView.setText(R.string.no_internet_connection);
 
         }
-
-        final SearchView searchView = (SearchView) findViewById(R.id.search_view);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                String text = searchView.getQuery().toString();
-                Intent i = new Intent(getApplicationContext(), QuerySearchManager.class);
-                i.putExtra("Title", text);
-                startActivity(i);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
     }
 
     @Override
