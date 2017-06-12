@@ -1,14 +1,11 @@
 package com.example.android.orshibooklistingapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,9 +13,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.R.attr.data;
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by orsi on 07/06/2017.
@@ -40,27 +34,12 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
         // create a new view
         View itemLayout = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.book_list_item, parent, false);
-        final ViewHolder viewHolder = new ViewHolder(itemLayout);
 
-        itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("TAG", "clicked position:" + viewHolder.getAdapterPosition());
-//                listener.onItemClick(v, viewHolder.getAdapterPosition());
-
-                Uri bookUri = Uri.parse(getItem(viewHolder.getAdapterPosition()).getUrl());
-                // Create a new intent to view the earthquake URI
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
-                // Send the intent to launch a new activity
-                v.getContext().startActivity(webIntent);
-            }
-        });
-
-        return viewHolder;
+        return new ViewHolder(itemLayout);
     }
 
     // Create the custom ViewHolder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView authors;
         TextView title;
@@ -72,6 +51,17 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
             image = (ImageView) itemView.findViewById(R.id.image);
             authors = (TextView) itemView.findViewById(R.id.author_text_view);
             title = (TextView) itemView.findViewById((R.id.title_text_view));
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri bookUri = Uri.parse(mDataset.get(getAdapterPosition()).getUrl());
+                    // Create a new intent to view the earthquake URI
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
+                    // Send the intent to launch a new activity
+                    v.getContext().startActivity(webIntent);
+                }
+            });
         }
 
         // ezeket elvileg simán az onBindViewHolder-ben kene definialni... mi;rt is csinaltuk igy?
