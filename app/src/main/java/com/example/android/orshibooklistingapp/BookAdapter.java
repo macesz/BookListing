@@ -16,9 +16,9 @@ import java.util.ArrayList;
  * Created by orsi on 07/06/2017.
  */
 
-public class BookAdapater extends ArrayAdapter<Book> {
+public class BookAdapter extends ArrayAdapter<Book> {
 
-    public BookAdapater(Context context, ArrayList<Book> books) {
+    public BookAdapter(Context context, ArrayList<Book> books) {
         super(context, 0, books);
     }
 

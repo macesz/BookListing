@@ -9,7 +9,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+//import android.support.v7.app.AlertController;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +29,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.R.attr.data;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 import static com.example.android.orshibooklistingapp.MainActivity.hideSoftKeyboard;
 
 
@@ -42,8 +49,15 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     ProgressBar progressBar;
     LoaderManager loaderManager;
     private TextView mEmptyStateTextView;
-    private BookAdapater mAdapter;
+
+//    private BookAdapter mAdapter;//TODO torolni
+    private static BookRecycleAdapter mRAdapter;
+    private static RecyclerView bookRListView;
+    private RecyclerView.LayoutManager layoutManager;
+
     private String finalRequestUrl;
+    static View.OnClickListener myOnClickListener;
+
 
     public void fetchResults(String query) {
         Intent i = new Intent(getApplicationContext(), QuerySearchManager.class);
@@ -55,6 +69,16 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        bookRListView = (RecyclerView) findViewById(R.id.list);
+        bookRListView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        bookRListView.setLayoutManager(layoutManager);
+        bookRListView.setItemAnimator(new DefaultItemAnimator());
+
+//        myOnClickListener = new MyOnClickListener(this);
+//        bookRListView.setOnClickListener(myOnClickListener);
+
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
@@ -91,37 +115,30 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         });
 
         // Find a reference to the {@link ListView} in the layout
-        ListView bookListView = (ListView) findViewById(R.id.list);
+//        ListView bookListView = (ListView) findViewById(R.id.list); //TODO torolni
+
+
         //Set the empty state View
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-        bookListView.setEmptyView(mEmptyStateTextView);
+
+//        bookListView.setEmptyView(mEmptyStateTextView); //todo torolni
+//        bookRListView.setEmptyView(mEmptyStateTextView); //TODO implementalni
 
 
         /* Adapter for the list of books */
-        mAdapter = new BookAdapater(this, new ArrayList<Book>());
+//        mAdapter = new BookAdapter(this, new ArrayList<Book>()); //TODO torolni
+        mRAdapter = new BookRecycleAdapter(new ArrayList<Book>(), new CustomItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Log.d("TAG", "clicked position:" + position);
+                String title = mRAdapter.getItem(position).getUrl();
+            }
+        });
 
         // Set the adapter on the ListView
         // so the list can be populated in the user interface
-        bookListView.setAdapter(mAdapter);
+        bookRListView.setAdapter(mRAdapter);
 
-        // Set an item click listener on the ListView, which sends an intent to a web browser
-        // to open a website with more information about the selected book.
-        bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Find the current book that was clicked on
-                Book currentBook = mAdapter.getItem(position);
-
-                // Convert the String URL into a URI object (to pass into the Intent constructor)
-                Uri bookUri = Uri.parse(currentBook.getUrl());
-
-                // Create a new intent to view the earthquake URI
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
-
-                // Send the intent to launch a new activity
-                startActivity(webIntent);
-            }
-        });
 
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -150,6 +167,37 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         }
     }
 
+    private static class MyOnClickListener implements View.OnClickListener {
+
+        private final Context context;
+
+        private MyOnClickListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.v("ORSI", "HELLO");
+            openItem(v);
+        }
+
+        private void openItem(View v) {
+            int selectedItemPosition = bookRListView.getChildPosition(v);
+
+            // Find the current book that was clicked on
+            Book currentBook = mRAdapter.getItem(selectedItemPosition);
+
+            // Convert the String URL into a URI object (to pass into the Intent constructor)
+            Uri bookUri = Uri.parse(currentBook.getUrl());
+
+            // Create a new intent to view the earthquake URI
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
+
+            // Send the intent to launch a new activity
+            context.startActivity(webIntent);
+        }
+    }
+
     @Override
     public Loader<List<Book>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
@@ -164,18 +212,25 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         mEmptyStateTextView.setText(R.string.no_books);
 
         // Clear the adapter of previous books data
-        mAdapter.clear();
+//        mAdapter.clear(); //TODO torolni
+        mRAdapter.clear();
 
         // If there is a valid list of {@link Book}s, then add them to the adapter's
         // data set. This will trigger the ListView to update.
         if (books != null && !books.isEmpty()) {
-            mAdapter.addAll(books);
+            mEmptyStateTextView.setVisibility(View.GONE);
+//            mAdapter.addAll(books); //TODO torolni
+            mRAdapter.addBooks(books);
+        }
+        else {
+            mEmptyStateTextView.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<List<Book>> loader) {
         // Loader reset, so we can clear out our existing data.
-        mAdapter.clear();
+//        mAdapter.clear(); //todo torolni
+        mRAdapter.clear();
     }
 }
