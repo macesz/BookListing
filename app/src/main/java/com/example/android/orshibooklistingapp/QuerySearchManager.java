@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,6 +34,7 @@ import static android.R.attr.data;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 import static com.example.android.orshibooklistingapp.MainActivity.hideSoftKeyboard;
+import static com.example.android.orshibooklistingapp.R.id.books;
 
 
 /**
@@ -49,14 +51,10 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     ProgressBar progressBar;
     LoaderManager loaderManager;
     private TextView mEmptyStateTextView;
-
-//    private BookAdapter mAdapter;//TODO torolni
-    private static BookRecycleAdapter mRAdapter;
-    private static RecyclerView bookRListView;
+    private  BookRecycleAdapter mRAdapter;
+    private  RecyclerView bookRListView;
     private RecyclerView.LayoutManager layoutManager;
-
     private String finalRequestUrl;
-    static View.OnClickListener myOnClickListener;
 
 
     public void fetchResults(String query) {
@@ -76,16 +74,12 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         bookRListView.setLayoutManager(layoutManager);
         bookRListView.setItemAnimator(new DefaultItemAnimator());
 
-//        myOnClickListener = new MyOnClickListener(this);
-//        bookRListView.setOnClickListener(myOnClickListener);
-
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         progressBar = (ProgressBar) findViewById(R.id.loading_indicator);
         progressBar.setVisibility(View.VISIBLE);
 
-        ImageView booksImage = (ImageView) findViewById(R.id.books);
+        ImageView booksImage = (ImageView) findViewById(books);
         booksImage.setVisibility(View.GONE);
 
         String QueryStr = getIntent().getStringExtra("QueryStr");
@@ -115,7 +109,7 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         });
 
         // Find a reference to the {@link ListView} in the layout
-//        ListView bookListView = (ListView) findViewById(R.id.list); //TODO torolni
+//        ListView bookListView = (ListView) findViewById(R.id.list);
 
 
         //Set the empty state View
@@ -126,17 +120,9 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
 
 
         /* Adapter for the list of books */
-//        mAdapter = new BookAdapter(this, new ArrayList<Book>()); //TODO torolni
-        mRAdapter = new BookRecycleAdapter(new ArrayList<Book>(), new CustomItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                Log.d("TAG", "clicked position:" + position);
-                String title = mRAdapter.getItem(position).getUrl();
-            }
-        });
+        mRAdapter = new BookRecycleAdapter(new ArrayList<Book>());
 
-        // Set the adapter on the ListView
-        // so the list can be populated in the user interface
+        // Set the adapter on the ListView so the list can be populated in the user interface
         bookRListView.setAdapter(mRAdapter);
 
 
@@ -167,41 +153,13 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         }
     }
 
-    private static class MyOnClickListener implements View.OnClickListener {
-
-        private final Context context;
-
-        private MyOnClickListener(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public void onClick(View v) {
-            Log.v("ORSI", "HELLO");
-            openItem(v);
-        }
-
-        private void openItem(View v) {
-            int selectedItemPosition = bookRListView.getChildPosition(v);
-
-            // Find the current book that was clicked on
-            Book currentBook = mRAdapter.getItem(selectedItemPosition);
-
-            // Convert the String URL into a URI object (to pass into the Intent constructor)
-            Uri bookUri = Uri.parse(currentBook.getUrl());
-
-            // Create a new intent to view the earthquake URI
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
-
-            // Send the intent to launch a new activity
-            context.startActivity(webIntent);
-        }
-    }
-
     @Override
     public Loader<List<Book>> onCreateLoader(int i, Bundle bundle) {
+
         // Create a new loader for the given URL
         return new BookLoader(this, finalRequestUrl);
+
+
     }
 
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
@@ -212,14 +170,28 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
         mEmptyStateTextView.setText(R.string.no_books);
 
         // Clear the adapter of previous books data
-//        mAdapter.clear(); //TODO torolni
         mRAdapter.clear();
 
         // If there is a valid list of {@link Book}s, then add them to the adapter's
         // data set. This will trigger the ListView to update.
         if (books != null && !books.isEmpty()) {
+            mRAdapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(Book currentBook) {
+                    if(currentBook!=null) {
+                        // Convert the String URL into a URI object (to pass into the Intent constructor)
+                        Uri bookUri = Uri.parse(currentBook.getUrl());
+                        
+                        // Create a new intent to view the earthquake URI
+                        Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
+
+                        // Send the intent to launch a new activity
+                        startActivity(webIntent);
+                    }
+                }
+            });
+
             mEmptyStateTextView.setVisibility(View.GONE);
-//            mAdapter.addAll(books); //TODO torolni
             mRAdapter.addBooks(books);
         }
         else {
@@ -230,7 +202,6 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     @Override
     public void onLoaderReset(Loader<List<Book>> loader) {
         // Loader reset, so we can clear out our existing data.
-//        mAdapter.clear(); //todo torolni
         mRAdapter.clear();
     }
 }

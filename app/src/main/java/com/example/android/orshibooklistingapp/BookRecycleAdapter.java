@@ -8,17 +8,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.data;
-import static android.content.ContentValues.TAG;
+import static com.example.android.orshibooklistingapp.R.id.books;
+import static com.example.android.orshibooklistingapp.R.id.image;
 
 /**
  * Created by orsi on 07/06/2017.
@@ -26,12 +26,12 @@ import static android.content.ContentValues.TAG;
 
 public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.ViewHolder> {
 
-    CustomItemClickListener listener;
-
     //I add a constructor to the custom adapter so that it has a handle to the data that the RecyclerView displays.
     private ArrayList<Book> mDataset;
+    public OnItemClickListener mOnItemClickListener;
 
-    public BookRecycleAdapter(ArrayList<Book> books, CustomItemClickListener listener) {
+
+    public BookRecycleAdapter(ArrayList<Book> books) {
         mDataset = books;
     }
 
@@ -40,30 +40,41 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
         // create a new view
         View itemLayout = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.book_list_item, parent, false);
-        final ViewHolder viewHolder = new ViewHolder(itemLayout);
+        ViewHolder holder = new ViewHolder(itemLayout);
 
-        itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("TAG", "clicked position:" + viewHolder.getAdapterPosition());
-//                listener.onItemClick(v, viewHolder.getAdapterPosition());
 
-                Uri bookUri = Uri.parse(getItem(viewHolder.getAdapterPosition()).getUrl());
-                // Create a new intent to view the earthquake URI
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
-                // Send the intent to launch a new activity
-                v.getContext().startActivity(webIntent);
-            }
-        });
-
-        return viewHolder;
+        return holder;
     }
 
-    // Create the custom ViewHolder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView image;
-        TextView authors;
-        TextView title;
+    @Override
+    public void onBindViewHolder(final BookRecycleAdapter.ViewHolder holder, final int position) {
+        final Book book = mDataset.get(position);
+        holder.setItem(mDataset.get(position));
+
+//        holder.title.setText((CharSequence) mDataset.get(position));
+//        holder.title.setText((CharSequence) mDataset.get(position));
+
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOnItemClickListener.onItemClick(book);
+            }
+        };
+        holder.image.setOnClickListener(listener);
+        holder.title.setOnClickListener(listener);
+        holder.authors.setOnClickListener(listener);
+    }
+    // Return the size of your dataset, the number of items present in the book. (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        protected ImageView image;
+        protected TextView authors;
+        protected TextView title;
 
         // Inside the constructor of our custom ViewHolder, initialize the views that belong to the items of our RecyclerView.
         public ViewHolder(View itemView) {
@@ -72,33 +83,24 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
             image = (ImageView) itemView.findViewById(R.id.image);
             authors = (TextView) itemView.findViewById(R.id.author_text_view);
             title = (TextView) itemView.findViewById((R.id.title_text_view));
+
         }
 
-        // ezeket elvileg simán az onBindViewHolder-ben kene definialni... mi;rt is csinaltuk igy?
+            // ezt elvileg simán az onBindViewHolder-ben kene definialni?
 
         public void setItem(Book item) {
-            Picasso.with(image.getContext()).load(item.getImage()).into(image);
             authors.setText(item.getAuthor());
             title.setText(item.getTitle());
+            Picasso.with(image.getContext()).load(item.getImage()).into(image);
         }
-    }
 
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.setItem(mDataset.get(position));
-    }
-
-    // Return the size of your dataset, the number of items present in the book. (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return mDataset.size();
     }
 
     // Return the position of your dataset
     public Book getItem(int position) {
         return mDataset.get(position);
     }
+
     // Clear dataset
     public void clear() {
         mDataset.clear();
@@ -108,4 +110,13 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
     public void addBooks(List<Book> books) {
         mDataset.addAll(books);
     }
+
+    public OnItemClickListener getOnItemClickListener() {
+        return mOnItemClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
 }
+
