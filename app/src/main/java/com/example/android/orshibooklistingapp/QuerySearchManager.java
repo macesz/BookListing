@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-//import android.support.v7.app.AlertController;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,21 +17,15 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.R.attr.data;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 import static com.example.android.orshibooklistingapp.MainActivity.hideSoftKeyboard;
 import static com.example.android.orshibooklistingapp.R.id.books;
 
@@ -51,8 +44,8 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
     ProgressBar progressBar;
     LoaderManager loaderManager;
     private TextView mEmptyStateTextView;
-    private  BookRecycleAdapter mRAdapter;
-    private  RecyclerView bookRListView;
+    private BookRecycleAdapter mRAdapter;
+    private RecyclerView bookRListView;
     private RecyclerView.LayoutManager layoutManager;
     private String finalRequestUrl;
 
@@ -108,23 +101,14 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
             }
         });
 
-        // Find a reference to the {@link ListView} in the layout
-//        ListView bookListView = (ListView) findViewById(R.id.list);
-
-
         //Set the empty state View
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-
-//        bookListView.setEmptyView(mEmptyStateTextView); //todo torolni
-//        bookRListView.setEmptyView(mEmptyStateTextView); //TODO implementalni
-
 
         /* Adapter for the list of books */
         mRAdapter = new BookRecycleAdapter(new ArrayList<Book>());
 
         // Set the adapter on the ListView so the list can be populated in the user interface
         bookRListView.setAdapter(mRAdapter);
-
 
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -149,7 +133,6 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
 
             // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet_connection);
-
         }
     }
 
@@ -158,8 +141,6 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
 
         // Create a new loader for the given URL
         return new BookLoader(this, finalRequestUrl);
-
-
     }
 
     public void onLoadFinished(Loader<List<Book>> loader, List<Book> books) {
@@ -178,10 +159,10 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
             mRAdapter.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(Book currentBook) {
-                    if(currentBook!=null) {
+                    if (currentBook != null) {
                         // Convert the String URL into a URI object (to pass into the Intent constructor)
                         Uri bookUri = Uri.parse(currentBook.getUrl());
-                        
+
                         // Create a new intent to view the earthquake URI
                         Intent webIntent = new Intent(Intent.ACTION_VIEW, bookUri);
 
@@ -193,8 +174,7 @@ public class QuerySearchManager extends AppCompatActivity implements LoaderCallb
 
             mEmptyStateTextView.setVisibility(View.GONE);
             mRAdapter.addBooks(books);
-        }
-        else {
+        } else {
             mEmptyStateTextView.setVisibility(View.VISIBLE);
         }
     }

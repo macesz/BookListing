@@ -1,24 +1,16 @@
 package com.example.android.orshibooklistingapp;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.android.orshibooklistingapp.R.id.books;
-import static com.example.android.orshibooklistingapp.R.id.image;
 
 /**
  * Created by orsi on 07/06/2017.
@@ -28,10 +20,10 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
 
     //I add a constructor to the custom adapter so that it has a handle to the data that the RecyclerView displays.
     private ArrayList<Book> mDataset;
-    public OnItemClickListener mOnItemClickListener;
+    private OnItemClickListener mOnItemClickListener;
 
 
-    public BookRecycleAdapter(ArrayList<Book> books) {
+    private BookRecycleAdapter(ArrayList<Book> books) {
         mDataset = books;
     }
 
@@ -42,7 +34,6 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
                 .inflate(R.layout.book_list_item, parent, false);
         ViewHolder holder = new ViewHolder(itemLayout);
 
-
         return holder;
     }
 
@@ -50,10 +41,6 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
     public void onBindViewHolder(final BookRecycleAdapter.ViewHolder holder, final int position) {
         final Book book = mDataset.get(position);
         holder.setItem(mDataset.get(position));
-
-//        holder.title.setText((CharSequence) mDataset.get(position));
-//        holder.title.setText((CharSequence) mDataset.get(position));
-
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -65,6 +52,7 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
         holder.title.setOnClickListener(listener);
         holder.authors.setOnClickListener(listener);
     }
+
     // Return the size of your dataset, the number of items present in the book. (invoked by the layout manager)
     @Override
     public int getItemCount() {
@@ -72,9 +60,9 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        protected ImageView image;
-        protected TextView authors;
-        protected TextView title;
+        private ImageView image;
+        private TextView authors;
+        private TextView title;
 
         // Inside the constructor of our custom ViewHolder, initialize the views that belong to the items of our RecyclerView.
         public ViewHolder(View itemView) {
@@ -86,14 +74,11 @@ public class BookRecycleAdapter extends RecyclerView.Adapter<BookRecycleAdapter.
 
         }
 
-            // ezt elvileg simán az onBindViewHolder-ben kene definialni?
-
         public void setItem(Book item) {
             authors.setText(item.getAuthor());
             title.setText(item.getTitle());
             Picasso.with(image.getContext()).load(item.getImage()).into(image);
         }
-
     }
 
     // Return the position of your dataset
